@@ -30,9 +30,19 @@ router.get('/:id', async (req, res) => {
 })
 
 // POST to /api/users
-router.post('/', (req, res) => {
-    
-})
+router.post('/', async (req, res) => {
+    try {
+        const { name } = req.body;
+        if (!name) {
+            res.status(400).json({error: "Please enter a name." });
+        } else {
+            const newUser = await Users.insert(req.body);
+            res.status(201).json({newUser});
+        }
+    } catch {
+        res.status(500).json({ error: "There was an error adding the new user to the database." });
+    }
+});
 
 // PUT to /api/users/:id
 router.put('/:id', (req, res) => {

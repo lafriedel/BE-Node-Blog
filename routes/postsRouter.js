@@ -27,12 +27,22 @@ router.get('/:id', async (req, res) => {
     } catch {
         res.status(500).json({error: "There was an error retrieving the post." });
     }
-})
+});
 
 // POST to /api/posts
-router.post('/', (req, res) => {
-    
-})
+router.post('/', async (req, res) => {
+    try {
+        const { text, user_id } = req.body;
+        if (!text || !user_id) {
+            res.status(400).json({error: "You must submit both text and a valid user id." });
+        } else {
+            const newPost = await Posts.insert(req.body);
+            res.status(201).json({newPost});
+        }
+    } catch {
+        res.status(500).json({ error: "There was an error submitting the new post." });
+    }
+});
 
 // PUT to /api/posts/:id
 router.put('/:id', (req, res) => {
