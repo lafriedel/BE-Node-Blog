@@ -5,9 +5,9 @@ const Posts = require("../data/helpers/postDb");
 
 const router = express.Router();
 
-function upperCaseCheck(req,res,next) {
-    req.body.name = req.body.name.toUpperCase();
-    next();
+function upperCaseCheck(req, res, next) {
+  req.body.name = req.body.name.toUpperCase();
+  next();
 }
 
 // GET to /api/users
@@ -109,22 +109,53 @@ router.delete("/:id", async (req, res) => {
           if (deleted === 1) {
             res.status(204).end();
           } else {
-              res.status(500).json({error: "There was an error deleting the posts of the specified user."});
+            res.status(500).json({
+              error:
+                "There was an error deleting the posts of the specified user."
+            });
           }
         });
-      };
+      }
 
-      await Users.remove(id)
-        .then(deleted => {
-            if (deleted === 1) {
-                res.status(204).end()
-            }
-        })
+      await Users.remove(id).then(deleted => {
+        if (deleted === 1) {
+          res.status(204).end();
+        }
+      });
     } else {
-        res.status(404).json({error: "The user with the specified ID does not exist."});
+      res
+        .status(404)
+        .json({ error: "The user with the specified ID does not exist." });
     }
   } catch {
     res.status(500).json({ error: "There was an error deleting the user." });
+  }
+});
+
+// GET posts of user
+router.get("/:id/posts", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await Users.getById(id);
+
+    if (user) {
+      await Users.getUserPosts(user.id).then(posts => {
+        if (posts.length !== 0) {
+          res.status(200).json(posts);
+        } else {
+          res.status(404).json({ error: "This user does not have any posts." });
+        }
+        // res.status(200).json(posts);
+      });
+    } else {
+      res
+        .status(404)
+        .json({ error: "A user with the specified ID does not exist." });
+    }
+  } catch {
+    res
+      .status(500)
+      .json({ error: "There was an error retrieving the user's posts." });
   }
 });
 
