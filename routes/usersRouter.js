@@ -45,8 +45,38 @@ router.post('/', async (req, res) => {
 });
 
 // PUT to /api/users/:id
-router.put('/:id', (req, res) => {
-    
+router.put('/:id', async (req, res) => {
+    try {
+
+        const { id } = req.params;
+        const { name } = req.body;
+
+        if (!name) {
+            res.status(400).json({error: "You must submit a name."})
+        } else {
+            const user = await Users.getById(id);
+            if (user) {
+                Users.update(id, req.body)
+                    .then(updated => {
+                        if (updated === 1) {
+                            Users.getById(id)
+                            .then(user => {
+                                res.status(200).json(user);
+                            })
+                        } else {
+                            res.status(500).json({error: "There was an error updating the user."})
+                        }
+                    })
+                    .catch(err => {
+                        res.status(500).json({error: "There was an error updating the user."})
+                    });
+            } else {
+                res.status(404).json({error: "The user with the specified ID does not exist."})
+            }
+        }
+    } catch {
+        res.status(500).json({error: "There was an error updating the user."})
+    }
 })
 
 // DELETE to /api/users/:id
