@@ -15,8 +15,18 @@ router.get('/', async (req, res) => {
 })
 
 // GET to /api/users/:id
-router.get('/:id', (req, res) => {
-
+router.get('/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const user = await Users.getById(id);
+        if (user) {
+            res.status(200).json({user});
+        } else {
+            res.status(404).json({error: "A post with the requested ID does not exist." });
+        }
+    } catch {
+        res.status(500).json({error: "There was an error retrieving the post." });
+    }
 })
 
 // POST to /api/users

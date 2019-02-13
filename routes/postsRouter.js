@@ -10,13 +10,23 @@ router.get('/', async (req, res) => {
         const posts = await Posts.get();
         res.status(200).json(posts);
     } catch {
-        res.status(500).json({ error: "There was an error retrieving the information."});
+        res.status(500).json({ error: "There was an error retrieving the posts."});
     }
 })
 
 // GET to /api/posts/:id
-router.get('/:id', (req, res) => {
-
+router.get('/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        const post = await Posts.getById(id);
+        if (post) {
+            res.status(200).json({post});
+        } else {
+            res.status(404).json({error: "A post with the requested ID does not exist." });
+        }
+    } catch {
+        res.status(500).json({error: "There was an error retrieving the post." });
+    }
 })
 
 // POST to /api/posts
