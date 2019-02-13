@@ -145,7 +145,6 @@ router.get("/:id/posts", async (req, res) => {
         } else {
           res.status(404).json({ error: "This user does not have any posts." });
         }
-        // res.status(200).json(posts);
       });
     } else {
       res
