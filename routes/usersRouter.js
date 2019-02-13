@@ -5,6 +5,11 @@ const Posts = require("../data/helpers/postDb");
 
 const router = express.Router();
 
+function capitalizationCheck(req,res,next) {
+    req.body.name = req.body.name.toUpperCase();
+    next();
+}
+
 // GET to /api/users
 router.get("/", async (req, res) => {
   try {
@@ -35,7 +40,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // POST to /api/users
-router.post("/", async (req, res) => {
+router.post("/", capitalizationCheck, async (req, res) => {
   try {
     const { name } = req.body;
     if (!name) {
@@ -52,7 +57,7 @@ router.post("/", async (req, res) => {
 });
 
 // PUT to /api/users/:id
-router.put("/:id", async (req, res) => {
+router.put("/:id", capitalizationCheck, async (req, res) => {
   try {
     const { id } = req.params;
     const { name } = req.body;
