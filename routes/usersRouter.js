@@ -1,6 +1,7 @@
 const express = require("express");
 
 const Users = require("../data/helpers/userDb");
+const Posts = require("../data/helpers/postDb");
 
 const router = express.Router();
 
@@ -44,11 +45,9 @@ router.post("/", async (req, res) => {
       res.status(201).json({ newUser });
     }
   } catch {
-    res
-      .status(500)
-      .json({
-        error: "There was an error adding the new user to the database."
-      });
+    res.status(500).json({
+      error: "There was an error adding the new user to the database."
+    });
   }
 });
 
@@ -92,6 +91,36 @@ router.put("/:id", async (req, res) => {
 });
 
 // DELETE to /api/users/:id
-router.delete("/:id", (req, res) => {});
+router.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await Users.getById(id);
+
+    if (user) {
+      const userPosts = await Users.getUserPosts(user.id);
+
+      for (let i = 0; i < userPosts.length; i++) {
+        Posts.remove(userPosts[i].id).then(deleted => {
+          if (deleted === 1) {
+            res.status(204).end();
+          } else {
+              res.status(500).json({error: "There was an error deleting the posts of the specified user."});
+          }
+        });
+      };
+
+      await Users.remove(id)
+        .then(deleted => {
+            if (deleted === 1) {
+                res.status(204).end()
+            }
+        })
+    } else {
+        res.status(404).json({error: "The user with the specified ID does not exist."});
+    }
+  } catch {
+    res.status(500).json({ error: "There was an error deleting the user." });
+  }
+});
 
 module.exports = router;

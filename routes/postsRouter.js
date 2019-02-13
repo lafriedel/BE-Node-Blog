@@ -93,22 +93,23 @@ router.put("/:id", async (req, res) => {
 
 // DELETE to /api/posts/:id
 router.delete("/:id", async (req, res) => {
-    try {
-        const { id } = req.params;
-        const post = await Posts.getById(id)
-            if (post) {
-                Posts.remove(id)
-                    .then(deleted => {
-                        if (deleted === 1) {
-                            res.status(204).end();
-                        }
-                    })
-            } else {
-                res.status(404).json({error: "A post with the requested ID does not exist."})
-            }
-    } catch {
-        res.status(500).json({error: "There was an error deleting the post."})
+  try {
+    const { id } = req.params;
+    const post = await Posts.getById(id);
+    if (post) {
+      Posts.remove(id).then(deleted => {
+        if (deleted === 1) {
+          res.status(204).end();
+        }
+      });
+    } else {
+      res
+        .status(404)
+        .json({ error: "A post with the requested ID does not exist." });
     }
+  } catch {
+    res.status(500).json({ error: "There was an error deleting the post." });
+  }
 });
 
 module.exports = router;
