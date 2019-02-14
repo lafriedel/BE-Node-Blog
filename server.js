@@ -15,6 +15,10 @@ server.use(helmet());
 server.use("/api/posts", postsRouter);
 server.use("/api/users", usersRouter);
 
+server.get("/", (req, res) => {
+    res.status(200).send("Welcome to the Node-Blog API. Please use /api/posts or /api/users to access information.")
+})
+
 server.use(errorHandler);
 
 module.exports = server;
